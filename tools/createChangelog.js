@@ -13,7 +13,7 @@ const mapUsernames = () =>
 		.then((res) => res.json())
 		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.username }), {}));
 
-const toSentenceCase = (str) =>
+const toTitleCase = (str) =>
 	str
 		.split("_")
 		.map((word) => word[0].toUpperCase() + word.slice(1))
@@ -96,7 +96,7 @@ async function createChangelog() {
 			...acc,
 			[texture.tags[0]]: [
 				...(acc[texture.tags[0]] ?? []),
-				`${toSentenceCase(texture.name)} (${texture.authors.join(", ")})`,
+				`${toTitleCase(texture.name)} (${texture.authors.join(", ")})`,
 			],
 		}),
 		{},

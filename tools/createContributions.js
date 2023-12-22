@@ -8,7 +8,7 @@ try {
 	FAITHFUL_API_TOKEN = require("../tokens.json").faithful_api_token;
 } catch {
 	console.error(
-		"You need to create a ./tokens.json file with your Faithful API token!\n" +
+		"You need to create a ../tokens.json file with your Faithful API token!\n" +
 			"I recommend cloning the GitHub repository and renaming the ./tokens.example.json file.",
 	);
 	process.exit(1);
@@ -93,12 +93,14 @@ async function createContributions(previousContributions = []) {
 	}
 
 	const textures = await getTextures();
-	if (!textures) return await createContributions(previousContributions);
+	if (!textures) return createContributions(previousContributions);
 
 	const contributions = [
 		...previousContributions,
 		...textures.map((texture) => ({ ...base, texture, pack: PACK, resolution: RESOLUTION })),
 	];
+
+	console.log(contributions);
 
 	if (CHAIN_CONTRIBUTIONS) {
 		// only write when the user is ready to, otherwise accumulate contributions
@@ -108,12 +110,12 @@ async function createContributions(previousContributions = []) {
 		if (confirm.toLowerCase() !== "y") {
 			console.log("Starting new contribution...\n\n");
 			// continue adding contributions to same array if not done (recursive)
-			return await createContributions(contributions);
+			return createContributions(contributions);
 		}
 	}
 
 	// don't write when in dev mode
-	if (DEV) return await createContributions(CHAIN_CONTRIBUTIONS ? contributions : []);
+	if (DEV) return createContributions(CHAIN_CONTRIBUTIONS ? contributions : []);
 
 	// either no chaining or chaining finished
 	return fetch("https://api.faithfulpack.net/v2/contributions", {
@@ -131,7 +133,7 @@ async function createContributions(previousContributions = []) {
 
 		console.log(data);
 		// start again from scratch now that chaining that particular one has stopped
-		return await createContributions();
+		return createContributions();
 	});
 }
 
