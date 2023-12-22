@@ -5,7 +5,7 @@
 
 let FAITHFUL_API_TOKEN;
 try {
-	FAITHFUL_API_TOKEN = require("./tokens.json").faithful_api_token;
+	FAITHFUL_API_TOKEN = require("../tokens.json").faithful_api_token;
 } catch {
 	console.error(
 		"You need to create a ./tokens.json file with your Faithful API token!\n" +

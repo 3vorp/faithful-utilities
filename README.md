@@ -1,5 +1,7 @@
 These are a collection of various utilities I've made to ease Faithful database management and usage.
 
+**All utilities are stored in the [`tools/`](./tools/) folder.**
+
 ## Installing
 
 All of these programs are written in NodeJS. First, install node from https://nodejs.org (either LTS or latest is fine).
