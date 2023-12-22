@@ -18,12 +18,13 @@ async function findMissingContributions() {
 		.filter((contribution) => contribution.pack == PACK)
 		.map((i) => i.texture);
 
-	const out = textures
-		.filter((texture) => idsWithContributions.includes(texture.id))
-		.map((texture) => `[#${texture.id}] ${texture.name}`)
-		.join("\n");
-
-	require("fs").writeFileSync("out.txt", Buffer.from(out));
+	require("fs").writeFileSync(
+		"out.txt",
+		textures
+			.filter((texture) => idsWithContributions.includes(texture.id))
+			.map((texture) => `[#${texture.id}] ${texture.name}`)
+			.join("\n"),
+	);
 	console.log("Written file to ./out.txt!");
 	process.exit();
 }
