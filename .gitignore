@@ -27,6 +27,9 @@ ehthumbs_vista.db
 .Trash-*
 .nfs*
 
+node_modules
+
 out.*
 changelog.json
 changelog.md
+tokens.json

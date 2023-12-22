@@ -3,7 +3,16 @@
  * @author Evorp
  */
 
-const FAITHFUL_API_TOKEN = "YOUR_TOKEN_HERE";
+let FAITHFUL_API_TOKEN;
+try {
+	FAITHFUL_API_TOKEN = require("./tokens.json").faithful_api_token;
+} catch {
+	console.error(
+		"You need to create a ./tokens.json file with your Faithful API token!\n" +
+			"I recommend cloning the GitHub repository and renaming the ./tokens.example.json file.",
+	);
+	process.exit(1);
+}
 
 const CHAIN_CONTRIBUTIONS = false; // after the first contribution reuse the same date and authors until you're done
 const DEV = false; // turn this off to actually enable writing
@@ -18,9 +27,7 @@ const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
 const mapUsernames = () =>
 	fetch("https://api.faithfulpack.net/v2/users/names")
 		.then((res) => res.json())
-		.then((d) =>
-			d.reduce((acc, cur) => ({ ...acc, [cur.username?.toLowerCase()]: cur.id }), {})
-		);
+		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.username?.toLowerCase()]: cur.id }), {}));
 
 /**
  * Prompt the user for a texture, give a choice menu if necessary, and return the texture ID
@@ -39,8 +46,8 @@ async function getTextures() {
 			`There are multiple textures: \n\t${textures
 				.map((t, i) => `${i + 1}) [#${t.id}] ${t.paths[0].name}`)
 				.join(
-					"\n\t"
-				)}\nChoose which texture you want using the corresponding number or range (inclusive): `
+					"\n\t",
+				)}\nChoose which texture you want using the corresponding number or range (inclusive): `,
 		);
 
 		if (i.includes("-")) {
@@ -96,7 +103,7 @@ async function createContributions(previousContributions = []) {
 	if (CHAIN_CONTRIBUTIONS) {
 		// only write when the user is ready to, otherwise accumulate contributions
 		const confirm = await prompt(
-			"Are you finished? Make sure this data looks correct before writing it [Y/N]: "
+			"Are you finished? Make sure this data looks correct before writing it [Y/N]: ",
 		);
 		if (confirm.toLowerCase() !== "y") {
 			console.log("Starting new contribution...\n\n");
