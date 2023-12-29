@@ -14,7 +14,7 @@ try {
 	process.exit(1);
 }
 
-const CHAIN_CONTRIBUTIONS = false; // after the first contribution reuse the same date and authors until you're done
+const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
 const DEV = false; // turn this off to actually enable writing
 
 const PACK = "classic_faithful_32x";
@@ -23,7 +23,7 @@ const RESOLUTION = 32;
 const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout });
 const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
 
-// will take some time
+// would make this global but it's async
 const mapUsernames = () =>
 	fetch("https://api.faithfulpack.net/v2/users/names")
 		.then((res) => res.json())
@@ -42,7 +42,8 @@ async function getTextures() {
 	if (!textures.length) return console.log("That texture doesn't exist!\n\nRestarting...");
 
 	if (textures.length > 1) {
-		const i = await prompt(
+		/** @type {string} */
+		const indexes = await prompt(
 			`There are multiple textures: \n\t${textures
 				.map((t, i) => `${i + 1}) [#${t.id}] ${t.paths[0].name}`)
 				.join(
@@ -50,10 +51,13 @@ async function getTextures() {
 				)}\nChoose which texture you want using the corresponding number or range (inclusive): `,
 		);
 
-		if (i.includes("-")) {
-			const [min, max] = i.split("-");
+		if (indexes.includes(",")) {
+			const split = indexes.split(",").map((v) => Number(v) - 1);
+			textures = textures.filter((_, index) => split.includes(index));
+		} else if (indexes.includes("-")) {
+			const [min, max] = indexes.split("-");
 			textures = textures.slice(min - 1, max);
-		} else textures = [textures[i - 1]];
+		} else textures = [textures[indexes - 1]];
 	}
 
 	return textures.map((t) => t.id);
