@@ -30,9 +30,9 @@ const mapUsernames = () =>
 		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.username?.toLowerCase()]: cur.id }), {}));
 
 /**
- * Prompt the user for a texture, give a choice menu if necessary, and return the texture ID
+ * Prompt the user for a texture, give a choice menu if necessary, and return the texture IDs
  * @author Evorp
- * @returns texture ID
+ * @returns texture IDs
  */
 async function getTextures() {
 	const textureName = await prompt("Give the name of the texture: ");
