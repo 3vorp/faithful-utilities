@@ -3,11 +3,10 @@
  * @author Evorp
  */
 
-
 // ----- config ----- //
 
 const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
-const DEV = false; // turn this off to actually enable writing
+const DEV = true; // turn this off to actually enable writing
 
 const PACK = "classic_faithful_32x"; // valid pack ID
 const RESOLUTION = 32; // could probably do this automatically but eh
@@ -34,6 +33,39 @@ const mapUsernames = () =>
 		.then((res) => res.json())
 		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.username?.toLowerCase()]: cur.id }), {}));
 
+function parseTextureIndexing(indexes, textures) {
+	// split by both spaces and commas if possible
+	const stuffToSelect =
+		indexes.includes(",") || indexes.includes(" ")
+			? indexes
+					.split(",")
+					.map((i) => i.split(" "))
+					.flat()
+					.filter((i) => i)
+			: [indexes];
+
+	return [
+		// remove duplicate selected textures
+		...new Set(
+			stuffToSelect
+				.reduce((acc, item) => {
+					// try for range
+					if (isNaN(Number(item))) {
+						const [min, max] = item.split("-").map((i) => Number(i));
+						// not a range
+						if (isNaN(min) || isNaN(max)) return acc;
+						return [...acc, ...textures.slice(min - 1, max)];
+					}
+
+					// regular number
+					return [...acc, textures[Number(item) - 1]];
+				}, [])
+				.filter((i) => i) // remove undefined items
+				.map((t) => t.id),
+		),
+	];
+}
+
 /**
  * Prompt the user for a texture, give a choice menu if necessary, and return the texture IDs
  * @author Evorp
@@ -45,27 +77,18 @@ async function getTextures() {
 	let textures = await res.json();
 
 	if (!textures.length) return console.log("That texture doesn't exist!\n\nRestarting...");
+	if (textures.length === 1) return [textures[0].id];
 
-	if (textures.length > 1) {
-		/** @type {string} */
-		const indexes = await prompt(
-			`There are multiple textures: \n\t${textures
-				.map((t, i) => `${i + 1}) [#${t.id}] ${t.paths[0].name}`)
-				.join(
-					"\n\t",
-				)}\nChoose which texture(s) you want using the corresponding number or range (inclusive): `,
-		);
+	/** @type {string} */
+	const indexes = await prompt(
+		`There are multiple textures: \n\t${textures
+			.map((t, i) => `${i + 1}) [#${t.id}] ${t.paths[0].name}`)
+			.join(
+				"\n\t",
+			)}\nChoose which texture(s) you want using the corresponding number or range (inclusive):\n`,
+	);
 
-		if (indexes.includes(",")) {
-			const split = indexes.split(",").map((v) => Number(v) - 1);
-			textures = textures.filter((_, index) => split.includes(index));
-		} else if (indexes.includes("-")) {
-			const [min, max] = indexes.split("-");
-			textures = textures.slice(min - 1, max);
-		} else textures = [textures[indexes - 1]];
-	}
-
-	return textures.map((t) => t.id);
+	return parseTextureIndexing(indexes, textures);
 }
 
 /**
@@ -90,6 +113,10 @@ async function createContributions(previousContributions = []) {
 		: {};
 
 	if (!previousContributions.length) {
+		if (DEV)
+			console.log(
+				"You are in developer mode! This disables database writing entirely for easier testing.",
+			);
 		const date = await prompt("Give the contribution date in the format YYYY-MM-DD: ");
 
 		const usernames = await getUsernames();
@@ -123,7 +150,9 @@ async function createContributions(previousContributions = []) {
 			return createContributions(contributions);
 		} else {
 			// don't accumulate if chaining is off, outright restart instead
-			console.log("Ditching data and starting new contribution...\n\tEnable chaining to accumulate contributions!\n\n");
+			console.log(
+				"Ditching data and starting new contribution...\n\tEnable chaining to accumulate contributions!\n\n",
+			);
 			return createContributions();
 		}
 	}
