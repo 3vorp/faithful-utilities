@@ -41,7 +41,7 @@ const fixTags = (tag) => {
 async function getPaths() {
 	const paths = [];
 	while (true) {
-		const pathName = await prompt('Give a texture path (use "DONE" to complete: ');
+		const pathName = await prompt('Give a texture path (use "DONE" to complete): ');
 		if (pathName == "DONE") break;
 		paths.push(pathName);
 	}
