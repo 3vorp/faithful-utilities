@@ -48,7 +48,7 @@ async function getTextures() {
 				.map((t, i) => `${i + 1}) [#${t.id}] ${t.paths[0].name}`)
 				.join(
 					"\n\t",
-				)}\nChoose which texture you want using the corresponding number or range (inclusive): `,
+				)}\nChoose which texture(s) you want using the corresponding number or range (inclusive): `,
 		);
 
 		if (indexes.includes(",")) {
