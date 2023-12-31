@@ -3,6 +3,17 @@
  * @author Evorp
  */
 
+
+// ----- config ----- //
+
+const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
+const DEV = false; // turn this off to actually enable writing
+
+const PACK = "classic_faithful_32x"; // valid pack ID
+const RESOLUTION = 32; // could probably do this automatically but eh
+
+// ------------------ //
+
 let FAITHFUL_API_TOKEN;
 try {
 	FAITHFUL_API_TOKEN = require("../tokens.json").faithful_api_token;
@@ -13,12 +24,6 @@ try {
 	);
 	process.exit(1);
 }
-
-const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
-const DEV = false; // turn this off to actually enable writing
-
-const PACK = "classic_faithful_32x";
-const RESOLUTION = 32;
 
 const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout });
 const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
@@ -106,21 +111,22 @@ async function createContributions(previousContributions = []) {
 	];
 
 	console.log(contributions);
-
-	if (CHAIN_CONTRIBUTIONS) {
-		// only write when the user is ready to, otherwise accumulate contributions
-		const confirm = await prompt(
-			"Are you finished? Make sure this data looks correct before writing it [Y/N]: ",
-		);
-		if (confirm.toLowerCase() !== "y") {
-			console.log("Starting new contribution...\n\n");
-			// continue adding contributions to same array if not done (recursive)
-			return createContributions(contributions);
-		}
-	}
-
 	// don't write when in dev mode
 	if (DEV) return createContributions(CHAIN_CONTRIBUTIONS ? contributions : []);
+
+	const confirm = await prompt(
+		"Are you finished? Make sure this data looks correct before writing it [Y/N]: ",
+	);
+	if (confirm.toLowerCase() !== "y") {
+		if (CHAIN_CONTRIBUTIONS) {
+			console.log("Starting new contribution...\n\n");
+			return createContributions(contributions);
+		} else {
+			// don't accumulate if chaining is off, outright restart instead
+			console.log("Ditching data and starting new contribution...\n\tEnable chaining to accumulate contributions!\n\n");
+			return createContributions();
+		}
+	}
 
 	// either no chaining or chaining finished
 	return fetch("https://api.faithfulpack.net/v2/contributions", {
