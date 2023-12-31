@@ -23,6 +23,9 @@ const toTitleCase = (str) =>
 		.map((word) => word[0].toUpperCase() + word.slice(1))
 		.join(" ");
 
+// remove extension and rest of path
+const getNameFromPath = (path) => path.split("/").at(-1).split(".")[0];
+
 const fixTags = (tag) => {
 	switch (tag) {
 		case "Blocks":
@@ -50,28 +53,27 @@ async function getPaths() {
 }
 
 async function createTextures(previousTextures = []) {
-	const out = {
-		tags: [],
-		uses: [],
-	};
-
 	const versions = await fetch("https://api.faithfulpack.net/v2/settings/versions").then((res) =>
 		res.json(),
 	);
 
 	const paths = await getPaths();
 	if (!paths.length) {
-		console.log("Finished adding textures, exiting program...")
+		console.log("Finished adding textures, exiting program...");
 		return process.exit(0);
 	}
 
-	// remove extension and rest of path
-	out.name = paths[0].split("/").at(-1).split(".")[0];
+	const out = {
+		// first path is used for texture name
+		name: getNameFromPath(paths[0]),
+		tags: [],
+		uses: [],
+	};
 
 	for (const path of paths) {
 		const edition = path.startsWith("assets") ? "java" : "bedrock";
 
-		// when creating textures, paths are stored inside the use data
+		// when creating textures, paths are stored inside uses
 		const pathData = {
 			name: path,
 			versions: [versions[edition][0]],
@@ -80,16 +82,18 @@ async function createTextures(previousTextures = []) {
 
 		const existingIndex = out.uses.findIndex((v) => v.edition === edition);
 		if (existingIndex == -1) {
-			// parent use not found yet
+			// use with correct edition doesn't exist yet, make a new one
 			out.uses.push({
-				edition: edition,
-				name: out.name,
+				edition,
+				// name use after first path in the use
+				name: getNameFromPath(path),
 				paths: [pathData],
 			});
 		} else out.uses[existingIndex].paths.push(pathData);
 
 		const textureFolderIndex = path.split("/").findIndex((v) => v == "textures");
 		out.tags = [
+			// remove duplicates
 			...new Set(
 				[
 					...out.tags,
@@ -110,6 +114,7 @@ async function createTextures(previousTextures = []) {
 	const confirm = await prompt(
 		"Are you finished? Make sure this data looks correct before writing it: [Y/N] ",
 	);
+
 	if (confirm.toLowerCase() !== "y") {
 		console.log("Starting new texture...\n\n");
 		// continue adding contributions to same array if not done (recursive)
