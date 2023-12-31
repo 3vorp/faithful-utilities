@@ -74,7 +74,8 @@ async function getUsernames() {
 		if (username == "DONE") break;
 		usernames.push(username.toLowerCase());
 	}
-	return usernames;
+	// remove any accidentally empty items
+	return usernames.filter((u) => u);
 }
 
 async function createContributions(previousContributions = []) {

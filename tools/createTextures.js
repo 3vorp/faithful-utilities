@@ -45,7 +45,8 @@ async function getPaths() {
 		if (pathName == "DONE") break;
 		paths.push(pathName);
 	}
-	return paths;
+	// remove any accidentally empty items
+	return paths.filter((p) => p);
 }
 
 async function createTextures(previousTextures = []) {
@@ -60,8 +61,8 @@ async function createTextures(previousTextures = []) {
 
 	const paths = await getPaths();
 	if (!paths.length) {
-		console.error("You didn't specify enough paths!");
-		return createTextures(previousTextures);
+		console.log("Finished adding textures, exiting program...")
+		return process.exit(0);
 	}
 
 	// remove extension and rest of path
