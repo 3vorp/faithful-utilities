@@ -1,10 +1,9 @@
+const PACK = "classic_faithful_32x";
+
 /**
  * Find missing contributions for a provided Faithful pack.
  * @author Evorp
  */
-
-const PACK = "classic_faithful_32x";
-
 async function findMissingContributions() {
 	const allTextures = await fetch("https://api.faithfulpack.net/v2/textures/raw").then((res) =>
 		res.json(),

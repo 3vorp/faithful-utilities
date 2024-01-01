@@ -4,20 +4,9 @@
  */
 
 const { writeFileSync } = require("fs");
-const rl = require("readline").createInterface(process.stdin, process.stdout);
-const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-// will take some time
-const mapUsernames = () =>
-	fetch("https://api.faithfulpack.net/v2/contributions/authors")
-		.then((res) => res.json())
-		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.username }), {}));
-
-const toTitleCase = (str) =>
-	str
-		.split("_")
-		.map((word) => word[0].toUpperCase() + word.slice(1))
-		.join(" ");
+const prompt = require("../lib/prompt");
+const mapUsernames = require("../lib/mapUsernames");
+const toTitleCase = require("../lib/toTitleCase");
 
 async function getPacks() {
 	const res = await fetch("https://api.faithfulpack.net/v2/settings/submission.packs");
@@ -30,7 +19,7 @@ async function getPacks() {
  * @author Evorp
  */
 async function createChangelog() {
-	const IDtoUsername = await mapUsernames();
+	const IDtoUsername = await mapUsernames(false);
 	const YMD = await prompt("Please give the date since the previous changelog (YYYY-MM-DD): ");
 	const res = await fetch(
 		`https://api.faithfulpack.net/v2/contributions/between/${new Date(

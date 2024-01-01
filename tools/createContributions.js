@@ -6,32 +6,17 @@
 // ----- config ----- //
 
 const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
-const DEV = true; // turn this off to actually enable writing
+const DEV = false; // turn this off to actually enable writing
 
 const PACK = "classic_faithful_32x"; // valid pack ID
 const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
-let FAITHFUL_API_TOKEN;
-try {
-	FAITHFUL_API_TOKEN = require("../tokens.json").faithful_api_token;
-} catch {
-	console.error(
-		"You need to create a ../tokens.json file with your Faithful API token!\n" +
-			"I recommend cloning the GitHub repository and renaming the ./tokens.example.json file.",
-	);
-	process.exit(1);
-}
-
-const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout });
-const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-// would make this global but it's async
-const mapUsernames = () =>
-	fetch("https://api.faithfulpack.net/v2/users/names")
-		.then((res) => res.json())
-		.then((d) => d.reduce((acc, cur) => ({ ...acc, [cur.username?.toLowerCase()]: cur.id }), {}));
+const FAITHFUL_API_TOKEN = require("../lib/getAPIToken")();
+const prompt = require("../lib/prompt");
+const mapUsernames = require("../lib/mapUsernames");
+const getUntilDONE = require("../lib/getUntilDONE");
 
 function parseTextureIndexing(indexes, textures) {
 	// split by both spaces and commas if possible
@@ -91,21 +76,6 @@ async function getTextures() {
 	return parseTextureIndexing(indexes, textures);
 }
 
-/**
- * Prompt the user for a series of usernames and append them to an array
- * @returns array of usernames
- */
-async function getUsernames() {
-	const usernames = [];
-	while (true) {
-		const username = await prompt('Enter a username (use "DONE" to move to the next step): ');
-		if (username == "DONE") break;
-		usernames.push(username.toLowerCase());
-	}
-	// remove any accidentally empty items
-	return usernames.filter((u) => u);
-}
-
 async function createContributions(previousContributions = []) {
 	// initialize base with previous author and date if possible
 	const base = previousContributions.length
@@ -119,13 +89,17 @@ async function createContributions(previousContributions = []) {
 			);
 		const date = await prompt("Give the contribution date in the format YYYY-MM-DD: ");
 
-		const usernames = await getUsernames();
-		const usernameToID = await mapUsernames();
+		const usernames = await getUntilDONE(
+			'Enter a username (use "DONE" to move to the next step): ',
+		);
+		const usernameToID = await mapUsernames(true);
 
 		base.date = new Date(date).getTime() + 82800000;
 		if (!base.date) console.error(`${date} isn't a valid date!`);
 		base.authors = usernames
-			.map((u) => usernameToID[u] ?? console.error(`No user called "${u}" was found!`))
+			.map(
+				(u) => usernameToID[u.toLowerCase()] ?? console.error(`No user called "${u}" was found!`),
+			)
 			.filter((v) => v);
 	}
 

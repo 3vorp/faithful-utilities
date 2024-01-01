@@ -3,25 +3,10 @@
  * @author Evorp
  */
 
-let FAITHFUL_API_TOKEN;
-try {
-	FAITHFUL_API_TOKEN = require("../tokens.json").faithful_api_token;
-} catch {
-	console.error(
-		"You need to create a ../tokens.json file with your Faithful API token!\n" +
-			"I recommend cloning the GitHub repository and renaming the ./tokens.example.json file.",
-	);
-	process.exit(1);
-}
-
-const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout });
-const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-const toTitleCase = (str) =>
-	str
-		.split("_")
-		.map((word) => word[0].toUpperCase() + word.slice(1))
-		.join(" ");
+const FAITHFUL_API_TOKEN = require("../lib/getAPIToken")();
+const getUntilDONE = require("../lib/getUntilDONE");
+const prompt = require("../lib/prompt");
+const toTitleCase = require("../lib/toTitleCase");
 
 // remove extension and rest of path
 const getNameFromPath = (path) => path.split("/").at(-1).split(".")[0];
@@ -41,23 +26,12 @@ const fixTags = (tag) => {
 	}
 };
 
-async function getPaths() {
-	const paths = [];
-	while (true) {
-		const pathName = await prompt('Give a texture path (use "DONE" to complete): ');
-		if (pathName == "DONE") break;
-		paths.push(pathName);
-	}
-	// remove any accidentally empty items
-	return paths.filter((p) => p);
-}
-
 async function createTextures(previousTextures = []) {
 	const versions = await fetch("https://api.faithfulpack.net/v2/settings/versions").then((res) =>
 		res.json(),
 	);
 
-	const paths = await getPaths();
+	const paths = await getUntilDONE('Give a texture path (use "DONE" to complete): ');
 	if (!paths.length) {
 		console.log("Finished adding textures, exiting program...");
 		return process.exit(0);
