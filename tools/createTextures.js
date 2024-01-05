@@ -91,7 +91,7 @@ async function createTextures(previousTextures = []) {
 
 	if (confirm.toLowerCase() !== "y") {
 		console.log("Starting new texture...\n\n");
-		// continue adding contributions to same array if not done (recursive)
+		// continue adding textures to same array if not done (recursive)
 		return createTextures(textures);
 	}
 
