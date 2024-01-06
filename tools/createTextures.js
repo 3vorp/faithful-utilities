@@ -120,7 +120,7 @@ async function createTextures(previousTextures = []) {
 		const data = await res.json();
 		if (!res.ok) return console.error(`An error occurred: ${JSON.stringify(data)}`);
 
-		console.log(data);
+		console.log(`Textures ${data.map((obj) => `[#${obj.id}]`).join(", ")} successfully added!\nStarting new texture...\n\n`);
 		// start again from scratch now that chaining that particular one has stopped
 		return createTextures();
 	});

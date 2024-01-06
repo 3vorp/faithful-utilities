@@ -60,7 +60,7 @@ async function getTextures() {
 	const res = await fetch(`https://api.faithfulpack.net/v2/textures/${textureName}/all`);
 	let textures = await res.json();
 
-	if (!textures.length) return console.log("That texture doesn't exist!\n\nRestarting...");
+	if (!textures.length) return console.log("That texture doesn't exist!\nRestarting...\n\n");
 	if (textures.length === 1) return [textures[0].id];
 
 	/** @type {string} */
@@ -125,7 +125,7 @@ async function createContributions(previousContributions = []) {
 		} else {
 			// don't accumulate if chaining is off, outright restart instead
 			console.log(
-				"Ditching data and starting new contribution...\n\tEnable chaining to accumulate contributions!\n\n",
+				"Discarding previous data and starting new contribution...\nEnable chaining to accumulate contributions!\n\n",
 			);
 			return createContributions();
 		}
@@ -145,7 +145,7 @@ async function createContributions(previousContributions = []) {
 		const data = await res.json();
 		if (!res.ok) return console.error(`An error occurred: ${JSON.stringify(data)}`);
 
-		console.log(data);
+		console.log(`Contributions ${data.map((obj) => obj.id).join(", ")} successfully added!\nStarting new contribution...\n\n`);
 		// start again from scratch now that chaining that particular one has stopped
 		return createContributions();
 	});
