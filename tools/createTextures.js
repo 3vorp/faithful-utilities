@@ -3,7 +3,7 @@
  * @author Evorp
  */
 
-const { faithful_api_token } = require("../lib/getTokens")();
+const { faithful_api_token, dev } = require("../lib/getTokens")();
 const getUntilDONE = require("../lib/getUntilDONE");
 const prompt = require("../lib/prompt");
 const toTitleCase = require("../lib/toTitleCase");
@@ -11,7 +11,7 @@ const toTitleCase = require("../lib/toTitleCase");
 // remove extension and rest of path
 const getNameFromPath = (path) => path.split("/").at(-1).split(".")[0];
 
-const fixTags = (tag) => {
+const formatTag = (tag) => {
 	switch (tag) {
 		case "Blocks":
 			return "Block";
@@ -26,7 +26,21 @@ const fixTags = (tag) => {
 	}
 };
 
+function sortTags(input) {
+	// remove duplicates/null items and alphabetically sort
+	let arr = [...new Set(input.filter((i) => i))].sort();
+	// shift java and bedrock tags to start
+	if (arr.includes("Bedrock")) arr = ["Bedrock", ...arr.filter((i) => i != "Bedrock")];
+	if (arr.includes("Java")) arr = ["Java", ...arr.filter((i) => i != "Java")];
+	return arr;
+}
+
 async function createTextures(previousTextures = []) {
+	if (!previousTextures.length && dev)
+		console.log(
+			"You are in developer mode! This disables database writing entirely for easier testing.",
+		);
+
 	const versions = await fetch("https://api.faithfulpack.net/v2/settings/versions").then((res) =>
 		res.json(),
 	);
@@ -59,30 +73,28 @@ async function createTextures(previousTextures = []) {
 			// use with correct edition doesn't exist yet, make a new one
 			out.uses.push({
 				edition,
-				// name use after first path in the use
+				// name after first path in the use
 				name: getNameFromPath(path),
 				paths: [pathData],
 			});
 		} else out.uses[existingIndex].paths.push(pathData);
 
 		const textureFolderIndex = path.split("/").findIndex((v) => v == "textures");
-		out.tags = [
-			// remove duplicates
-			...new Set(
-				[
-					...out.tags,
-					toTitleCase(edition),
-					toTitleCase(textureFolderIndex == -1 ? null : path.split("/")[textureFolderIndex + 1]),
-				]
-					.map(fixTags)
-					.filter((i) => i), // remove null entries if texture folder not found
-			),
-		];
+		out.tags = sortTags(
+			[
+				...out.tags,
+				toTitleCase(edition),
+				toTitleCase(textureFolderIndex == -1 ? null : path.split("/")[textureFolderIndex + 1]),
+			].map(formatTag),
+		);
 	}
 
 	// add back previous textures from chain
 	const textures = [...previousTextures, out];
 	console.log(JSON.stringify(textures, null, 4));
+
+	// don't write when in dev mode
+	if (dev) return createTextures(textures);
 
 	// only write when the user is ready to, otherwise accumulate textures
 	const confirm = await prompt(

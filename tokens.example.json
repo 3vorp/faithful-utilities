@@ -1,3 +1,4 @@
 {
-    "faithful_api_token": "YOUR_TOKEN_HERE"
+    "faithful_api_token": "YOUR_TOKEN_HERE",
+    "dev": false
 }

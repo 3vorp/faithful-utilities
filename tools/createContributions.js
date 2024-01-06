@@ -6,14 +6,13 @@
 // ----- config ----- //
 
 const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
-const DEV = false; // turn this off to actually enable writing
 
 const PACK = "classic_faithful_32x"; // valid pack ID
 const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
-const { faithful_api_token } = require("../lib/getTokens")();
+const { faithful_api_token, dev } = require("../lib/getTokens")();
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const getUntilDONE = require("../lib/getUntilDONE");
@@ -83,7 +82,7 @@ async function createContributions(previousContributions = []) {
 		: {};
 
 	if (!previousContributions.length) {
-		if (DEV)
+		if (dev)
 			console.log(
 				"You are in developer mode! This disables database writing entirely for easier testing.",
 			);
@@ -112,8 +111,9 @@ async function createContributions(previousContributions = []) {
 	];
 
 	console.log(contributions);
+
 	// don't write when in dev mode
-	if (DEV) return createContributions(CHAIN_CONTRIBUTIONS ? contributions : []);
+	if (dev) return createContributions(CHAIN_CONTRIBUTIONS ? contributions : []);
 
 	const confirm = await prompt(
 		"Are you finished? Make sure this data looks correct before writing it [Y/N]: ",
