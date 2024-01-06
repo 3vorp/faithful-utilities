@@ -3,7 +3,7 @@
  * @author Evorp
  */
 
-const FAITHFUL_API_TOKEN = require("../lib/getAPIToken")();
+const { faithful_api_token } = require("../lib/getToken")();
 const getUntilDONE = require("../lib/getUntilDONE");
 const prompt = require("../lib/prompt");
 const toTitleCase = require("../lib/toTitleCase");
@@ -98,7 +98,7 @@ async function createTextures(previousTextures = []) {
 	return fetch("https://api.faithfulpack.net/v2/textures/multiple", {
 		method: "post",
 		headers: {
-			bot: FAITHFUL_API_TOKEN,
+			bot: faithful_api_token,
 			// stupid fetch api stuff, I wish I was using axios here lol
 			Accept: "application/json",
 			"Content-Type": "application/json",

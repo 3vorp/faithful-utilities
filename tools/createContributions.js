@@ -13,7 +13,7 @@ const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
-const FAITHFUL_API_TOKEN = require("../lib/getAPIToken")();
+const { faithful_api_token } = require("../lib/getToken")();
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const getUntilDONE = require("../lib/getUntilDONE");
@@ -135,7 +135,7 @@ async function createContributions(previousContributions = []) {
 	return fetch("https://api.faithfulpack.net/v2/contributions", {
 		method: "post",
 		headers: {
-			bot: FAITHFUL_API_TOKEN,
+			bot: faithful_api_token,
 			// stupid fetch api stuff, I wish I was using axios here lol
 			Accept: "application/json",
 			"Content-Type": "application/json",
