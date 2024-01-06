@@ -3,7 +3,7 @@
  * @author Evorp
  */
 
-const { faithful_api_token } = require("../lib/getToken")();
+const { faithful_api_token } = require("../lib/getTokens")();
 const getUntilDONE = require("../lib/getUntilDONE");
 const prompt = require("../lib/prompt");
 const toTitleCase = require("../lib/toTitleCase");

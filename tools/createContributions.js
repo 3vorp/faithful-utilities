@@ -13,13 +13,13 @@ const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
-const { faithful_api_token } = require("../lib/getToken")();
+const { faithful_api_token } = require("../lib/getTokens")();
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const getUntilDONE = require("../lib/getUntilDONE");
 
 function parseTextureIndexing(indexes, textures) {
-	// split by both spaces and commas if possible
+	// split by both spaces and commas
 	const stuffToSelect =
 		indexes.includes(",") || indexes.includes(" ")
 			? indexes
