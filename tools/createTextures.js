@@ -1,11 +1,12 @@
 /**
- * Slimmed down version of the Faithful webapp texture adder, for faster texture creation
+ * Slimmed down version of the Faithful web app texture adder, for faster texture creation
  * @author Evorp
  */
 
 const { faithful_api_token, dev } = require("../lib/getTokens")();
 const getUntilDONE = require("../lib/getUntilDONE");
 const prompt = require("../lib/prompt");
+const sortTags = require("../lib/sortTags");
 const toTitleCase = require("../lib/toTitleCase");
 
 // remove extension and rest of path
@@ -25,15 +26,6 @@ const formatTag = (tag) => {
 			return tag;
 	}
 };
-
-function sortTags(input) {
-	// remove duplicates/null items and alphabetically sort
-	let arr = [...new Set(input.filter((i) => i))].sort();
-	// shift java and bedrock tags to start
-	if (arr.includes("Bedrock")) arr = ["Bedrock", ...arr.filter((i) => i != "Bedrock")];
-	if (arr.includes("Java")) arr = ["Java", ...arr.filter((i) => i != "Java")];
-	return arr;
-}
 
 async function createTextures(previousTextures = []) {
 	if (!previousTextures.length && dev)
