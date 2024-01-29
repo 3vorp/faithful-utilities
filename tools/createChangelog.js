@@ -9,9 +9,9 @@ const mapUsernames = require("../lib/mapUsernames");
 const toTitleCase = require("../lib/toTitleCase");
 
 async function getPacks() {
-	const res = await fetch("https://api.faithfulpack.net/v2/settings/submission.packs");
+	const res = await fetch("https://api.faithfulpack.net/v2/packs/search?type=submission");
 	const allPacks = await res.json();
-	return Object.entries(allPacks).map(([k, v]) => ({ id: k, name: v.display_name }));
+	return allPacks.map((pack) => ({ id: pack.id, name: pack.name }));
 }
 
 /**
@@ -57,21 +57,23 @@ async function createChangelog() {
 			return acc;
 		}, []);
 
-	const textureData = (
-		await Promise.all(
-			groupedIDs.map(async (ids) => {
-				// get texture data in batches of 30
-				return await fetch(`https://api.faithfulpack.net/v2/textures/${ids.join(",")}`)
-					.then((res) => res.json())
-					.catch(() => null);
-			}),
+	const textureData =
+		// faster to resolve all promises at once than to wait for each one to finish
+		(
+			await Promise.all(
+				groupedIDs.map((ids) => {
+					// get texture data in batches of 30
+					return fetch(`https://api.faithfulpack.net/v2/textures/${ids.join(",")}`)
+						.then((res) => res.json())
+						.catch(() => null);
+				}),
+			)
 		)
-	)
-		.flat()
-		.map((texture) => ({
-			...texture,
-			tags: texture.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())),
-		}));
+			.flat()
+			.map((texture) => ({
+				...texture,
+				tags: texture.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())),
+			}));
 
 	// merge the two objects by id
 	const finalData = packContributions.map((contribution) => ({

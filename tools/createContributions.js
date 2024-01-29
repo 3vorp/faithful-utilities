@@ -145,7 +145,11 @@ async function createContributions(previousContributions = []) {
 		const data = await res.json();
 		if (!res.ok) return console.error(`An error occurred: ${JSON.stringify(data)}`);
 
-		console.log(`Contributions ${data.map((obj) => obj.id).join(", ")} successfully added!\nStarting new contribution...\n\n`);
+		console.log(
+			`Contributions ${data
+				.map((obj) => obj.id)
+				.join(", ")} successfully added!\nStarting new contribution...\n\n`,
+		);
 		// start again from scratch now that chaining that particular one has stopped
 		return createContributions();
 	});
