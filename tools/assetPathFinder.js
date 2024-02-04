@@ -1,3 +1,4 @@
+const { api_url } = require("./getTokens")();
 const minecraftSorter = require("../lib/minecraftSorter");
 
 /**
@@ -5,7 +6,7 @@ const minecraftSorter = require("../lib/minecraftSorter");
  * @author Evorp
  */
 async function assetPathFinder() {
-	const paths = await fetch(`https://api.faithfulpack.net/v2/paths/raw`).then((res) => res.json());
+	const paths = await fetch(`${api_url}paths/raw`).then((res) => res.json());
 
 	const results = Object.values(paths).reduce((acc, path) => {
 		if (path.name.startsWith("assets")) return acc;

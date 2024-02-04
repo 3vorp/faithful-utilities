@@ -12,7 +12,7 @@ const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
-const { faithful_api_token, dev } = require("../lib/getTokens")();
+const { faithful_api_token, dev, api_url } = require("../lib/getTokens")();
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const getUntilDONE = require("../lib/getUntilDONE");
@@ -57,7 +57,7 @@ function parseTextureIndexing(indexes, textures) {
  */
 async function getTextures() {
 	const textureName = await prompt("Give the name of the texture: ");
-	const res = await fetch(`https://api.faithfulpack.net/v2/textures/${textureName}/all`);
+	const res = await fetch(`${api_url}textures/${textureName}/all`);
 	let textures = await res.json();
 
 	if (!textures.length) return console.log("That texture doesn't exist!\nRestarting...\n\n");
@@ -132,7 +132,7 @@ async function createContributions(previousContributions = []) {
 	}
 
 	// either no chaining or chaining finished
-	return fetch("https://api.faithfulpack.net/v2/contributions", {
+	return fetch(`${api_url}contributions`, {
 		method: "post",
 		headers: {
 			bot: faithful_api_token,

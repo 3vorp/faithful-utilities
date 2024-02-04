@@ -1,3 +1,5 @@
+const { api_url } = require("../lib/getTokens")();
+
 const PACK = "classic_faithful_32x";
 
 /**
@@ -5,12 +7,10 @@ const PACK = "classic_faithful_32x";
  * @author Evorp
  */
 async function findMissingContributions() {
-	const allTextures = await fetch("https://api.faithfulpack.net/v2/textures/raw").then((res) =>
+	const allTextures = await fetch(`${api_url}textures/raw`).then((res) => res.json());
+	const allContributions = await fetch(`${api_url}contributions/search?packs=${PACK}`).then((res) =>
 		res.json(),
 	);
-	const allContributions = await fetch(
-		`https://api.faithfulpack.net/v2/contributions/search?packs=${PACK}`,
-	).then((res) => res.json());
 
 	const textures = Object.values(allTextures).sort((a, b) => a.id - b.id);
 	const idsWithContributions = allContributions.map((i) => i.texture);

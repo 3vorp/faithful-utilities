@@ -1,12 +1,12 @@
 const sortTags = require("../lib/sortTags");
-const { faithful_api_token, dev } = require("../lib/getTokens")();
+const { faithful_api_token, api_url, dev } = require("../lib/getTokens")();
 
 /**
  * Sort the tags of all textures that aren't properly sorted.
  * @author Evorp
  */
 async function sortAllTags() {
-	const res = await fetch("https://api.faithfulpack.net/v2/textures/raw");
+	const res = await fetch(`${api_url}textures/raw`);
 	const textures = await res.json();
 	Promise.all(
 		Object.values(textures).map((texture) => {
@@ -18,7 +18,7 @@ async function sortAllTags() {
 				);
 
 			console.log(`Fixing [#${texture.id}] (${texture.name}): ${texture.tags.join(", ")}...`);
-			return fetch(`https://api.faithfulpack.net/v2/textures/${texture.id}`, {
+			return fetch(`${api_url}textures/${texture.id}`, {
 				method: "put",
 				headers: {
 					bot: faithful_api_token,

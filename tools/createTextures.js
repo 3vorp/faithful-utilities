@@ -3,7 +3,7 @@
  * @author Evorp
  */
 
-const { faithful_api_token, dev } = require("../lib/getTokens")();
+const { faithful_api_token, api_url, dev } = require("../lib/getTokens")();
 const getUntilDONE = require("../lib/getUntilDONE");
 const prompt = require("../lib/prompt");
 const sortTags = require("../lib/sortTags");
@@ -33,9 +33,7 @@ async function createTextures(previousTextures = []) {
 			"You are in developer mode! This disables database writing entirely for easier testing.",
 		);
 
-	const versions = await fetch("https://api.faithfulpack.net/v2/settings/versions").then((res) =>
-		res.json(),
-	);
+	const versions = await fetch(`${api_url}settings/versions`).then((res) => res.json());
 
 	const paths = await getUntilDONE('Give a texture path (use "DONE" to complete): ');
 	if (!paths.length) {
@@ -99,7 +97,7 @@ async function createTextures(previousTextures = []) {
 		return createTextures(textures);
 	}
 
-	return fetch("https://api.faithfulpack.net/v2/textures/multiple", {
+	return fetch(`${api_url}textures/multiple`, {
 		method: "post",
 		headers: {
 			bot: faithful_api_token,

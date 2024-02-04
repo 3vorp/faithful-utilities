@@ -16,6 +16,6 @@
 	},
 	"homepage": "https://github.com/3vorp/faithful-utilities#readme",
 	"dependencies": {
-		"prettier": "^3.2.4"
+		"prettier": "^3.2.5"
 	}
 }

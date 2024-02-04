@@ -7,9 +7,10 @@ const { writeFileSync } = require("fs");
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const toTitleCase = require("../lib/toTitleCase");
+const { api_url } = require("./getTokens")();
 
 async function getPacks() {
-	const res = await fetch("https://api.faithfulpack.net/v2/packs/search?type=submission");
+	const res = await fetch(`${api_url}packs/search?type=submission`);
 	const allPacks = await res.json();
 	return allPacks.map((pack) => ({ id: pack.id, name: pack.name }));
 }
@@ -22,9 +23,7 @@ async function createChangelog() {
 	const IDtoUsername = await mapUsernames(false);
 	const YMD = await prompt("Please give the date since the previous changelog (YYYY-MM-DD): ");
 	const res = await fetch(
-		`https://api.faithfulpack.net/v2/contributions/between/${new Date(
-			YMD,
-		).getTime()}/${new Date().getTime()}`,
+		`${api_url}contributions/between/${new Date(YMD).getTime()}/${new Date().getTime()}`,
 	);
 	const allContributions = await res.json();
 	const packs = await getPacks();
@@ -63,7 +62,7 @@ async function createChangelog() {
 			await Promise.all(
 				groupedIDs.map((ids) => {
 					// get texture data in batches of 30
-					return fetch(`https://api.faithfulpack.net/v2/textures/${ids.join(",")}`)
+					return fetch(`${api_url}textures/${ids.join(",")}`)
 						.then((res) => res.json())
 						.catch(() => null);
 				}),

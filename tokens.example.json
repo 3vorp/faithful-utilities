@@ -1,4 +1,5 @@
 {
+    "api_url": "https://api.faithfulpack.net/v2/",
     "faithful_api_token": "YOUR_TOKEN_HERE",
     "dev": false
 }
