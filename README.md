@@ -12,6 +12,6 @@ After that's done, you can run any of these files using this command.
 node your/file/path/here
 ```
 
-## Authentication
+## Configuration and Authentication
 
 If you get a warning about missing tokens, this is because you need to use privileged endpoints that not everyone can access. Make sure there's a `tokens.json` file present in your repository folder — you can simply rename the provided [`tokens.example.json`](./tokens.example.json) file and add necessary authorization.
