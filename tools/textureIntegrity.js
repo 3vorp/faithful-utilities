@@ -16,17 +16,14 @@ async function textureIntegrity() {
 	const uses = await rawFetch("uses");
 	const paths = await rawFetch("paths");
 
-	const all = textures
-		.map((tex) => ({
-			...tex,
-			uses: uses.filter((u) => u.texture == tex.id),
-		}))
-		.map((tex) => ({
-			...tex,
-			paths: paths.filter((p) => tex.uses.map((u) => u.id).includes(p.use)),
-		}));
+	// quick version of /v2/textures/<id>/all for every texture
+	const all = textures.map((tex) => ({
+		...tex,
+		uses: uses.filter((u) => u.texture == tex.id),
+		// not reliant on uses and can catch "stranded" paths
+		paths: paths.filter((p) => p.use.startsWith(tex.id)),
+	}));
 
-	// both missing uses and paths are picked up
 	require("fs").writeFileSync(
 		"./out.json",
 		JSON.stringify(
