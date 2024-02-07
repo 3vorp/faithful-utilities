@@ -21,11 +21,7 @@ function parseTextureIndexing(indexes, textures) {
 	// split by both spaces and commas
 	const stuffToSelect =
 		indexes.includes(",") || indexes.includes(" ")
-			? indexes
-					.split(",")
-					.map((i) => i.split(" "))
-					.flat()
-					.filter((i) => i)
+			? indexes.split(/,| /g).filter((i) => i)
 			: [indexes];
 
 	return [
