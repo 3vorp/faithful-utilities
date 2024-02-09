@@ -21,13 +21,15 @@ async function textureIntegrity() {
 		...tex,
 		uses: uses.filter((u) => u.texture == tex.id),
 		// not reliant on uses and can catch "stranded" paths
-		paths: paths.filter((p) => p.use.startsWith(tex.id)),
+		paths: paths.filter((p) => p.use.match(/\d+/g)?.[0] == tex.id),
 	}));
 
 	require("fs").writeFileSync(
 		"./out.json",
 		JSON.stringify(
-			all.filter((t) => !t.paths.length),
+			all.filter(
+				(t) => !t.paths.length || !t.uses.length || t.paths.some((p) => !p.versions.length),
+			),
 			null,
 			4,
 		),
