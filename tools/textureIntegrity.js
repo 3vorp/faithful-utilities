@@ -12,9 +12,11 @@ const rawFetch = (path) =>
 
 async function textureIntegrity() {
 	// faster to implement logic ourselves than to fetch 6000 times
-	const textures = await rawFetch("textures");
-	const uses = await rawFetch("uses");
-	const paths = await rawFetch("paths");
+	const [textures, uses, paths] = await Promise.all([
+		rawFetch("textures"),
+		rawFetch("uses"),
+		rawFetch("paths"),
+	]);
 
 	// quick version of /v2/textures/<id>/all for every texture
 	const all = textures.map((tex) => ({
