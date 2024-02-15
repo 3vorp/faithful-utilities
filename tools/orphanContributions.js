@@ -9,7 +9,7 @@ async function orphanContributions() {
 		fetch(`${api_url}textures/raw`).then((res) => res.json()),
 	]);
 
-	const orphaned = contributions.filter((contrib) => !textures[contrib.texture]);
+	const orphaned = contributions.filter((contrib) => !textures[contrib.texture]).map((o) => o.id);
 	writeFileSync("out.json", JSON.stringify(orphaned, null, 4));
 	console.log("Written file to ./out.json!");
 	process.exit();
