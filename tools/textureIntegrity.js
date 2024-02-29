@@ -30,7 +30,11 @@ async function textureIntegrity() {
 		"./out.json",
 		JSON.stringify(
 			all.filter(
-				(t) => !t.paths.length || !t.uses.length || t.paths.some((p) => !p.versions.length),
+				(t) =>
+					!t.tags.length ||
+					!t.paths.length ||
+					!t.uses.length ||
+					t.paths.some((p) => !p.versions.length),
 			),
 			null,
 			4,

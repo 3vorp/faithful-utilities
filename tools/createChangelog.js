@@ -7,7 +7,7 @@ const { writeFileSync } = require("fs");
 const prompt = require("../lib/prompt");
 const mapUsernames = require("../lib/mapUsernames");
 const toTitleCase = require("../lib/toTitleCase");
-const { api_url } = require("./getTokens")();
+const { api_url } = require("../lib/getTokens")();
 
 async function getPacks() {
 	const res = await fetch(`${api_url}packs/search?type=submission`);
@@ -35,50 +35,28 @@ async function createChangelog() {
 			.join("\n\t")}\nChoose which pack you want using the corresponding number: `,
 	);
 
-	console.log(
-		"Collecting data...\nThis can take some time for big changelogs, please be patient...",
-	);
+	console.log("Collecting data...");
 
-	// remove unnecessary info to save time later on
+	// get author names
 	const packContributions = allContributions
-		.filter((contribution) => contribution.pack == packs[packIndex - 1].id)
+		.filter((contribution) => contribution.pack === packs[packIndex - 1].id)
 		.map((contribution) => ({
-			id: contribution.texture,
+			...contribution,
 			authors: contribution.authors.map((author) => IDtoUsername[author] ?? "Anonymous"),
 		}));
 
-	// group ids into 30-long nested arrays
-	const groupedIDs = packContributions
-		.map((contribution) => contribution.id)
-		.reduce((acc, cur, index) => {
-			if (index % 30 === 0) acc.push([]);
-			acc.at(-1).push(cur);
-			return acc;
-		}, []);
+	const textures = await fetch(`${api_url}textures/raw`).then((res) => res.json());
 
-	const textureData =
-		// faster to resolve all promises at once than to wait for each one to finish
-		(
-			await Promise.all(
-				groupedIDs.map((ids) => {
-					// get texture data in batches of 30
-					return fetch(`${api_url}textures/${ids.join(",")}`)
-						.then((res) => res.json())
-						.catch(() => null);
-				}),
-			)
-		)
-			.flat()
-			.map((texture) => ({
-				...texture,
-				tags: texture.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())),
-			}));
-
-	// merge the two objects by id
-	const finalData = packContributions.map((contribution) => ({
-		...contribution,
-		...textureData.find((texture) => texture.id == contribution.id),
-	}));
+	// merge the two objects by id (faster than fetching individually)
+	const finalData = packContributions
+		.map((contribution) => ({
+			...contribution,
+			...textures[contribution.texture],
+		}))
+		.map((data) => ({
+			...data,
+			tags: data.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())).sort(),
+		}));
 
 	// group by texture tag (easier than going off paths)
 	const formatted = finalData.reduce(
