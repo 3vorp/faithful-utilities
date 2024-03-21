@@ -1,4 +1,4 @@
-const { api_url } = require("./getTokens")();
+const { api_url } = require("../lib/getTokens")();
 const minecraftSorter = require("../lib/minecraftSorter");
 
 /**
