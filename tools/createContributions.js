@@ -8,7 +8,6 @@
 const CHAIN_CONTRIBUTIONS = true; // after the first contribution reuse the same date and authors until you're done
 
 const PACK = "classic_faithful_32x"; // valid pack ID
-const RESOLUTION = 32; // could probably do this automatically but eh
 
 // ------------------ //
 
@@ -103,7 +102,7 @@ async function createContributions(previousContributions = []) {
 
 	const contributions = [
 		...previousContributions,
-		...textures.map((texture) => ({ ...base, texture, pack: PACK, resolution: RESOLUTION })),
+		...textures.map((texture) => ({ ...base, texture, pack: PACK })),
 	];
 
 	console.log(contributions);
