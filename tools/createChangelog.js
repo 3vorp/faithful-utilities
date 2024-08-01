@@ -48,7 +48,7 @@ async function createChangelog() {
 	const textures = await fetch(`${api_url}textures/raw`).then((res) => res.json());
 
 	// merge the two objects by id (faster than fetching individually)
-	const finalData = packContributions
+	const duplicateData = packContributions
 		.map((contribution) => ({
 			...contribution,
 			...textures[contribution.texture],
@@ -57,6 +57,15 @@ async function createChangelog() {
 			...data,
 			tags: data.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())).sort(),
 		}));
+
+	const finalData = Object.values(
+		duplicateData.reduce((acc, cur) => {
+			// newer date wins
+			if (acc[cur.texture] === undefined || acc[cur.texture]?.date < cur.date)
+				acc[cur.texture] = cur;
+			return acc;
+		}, {}),
+	);
 
 	// group by texture tag (easier than going off paths)
 	const formatted = finalData.reduce(
@@ -80,7 +89,7 @@ async function createChangelog() {
 			.join("\n\n"),
 	);
 	console.log(
-		"Written changelog file to ./changelog.json and ./changelog.md!\nRemember this is not directly compatible with website posts, use a JSON to YAML parser like https://json2yaml.com/ for that.",
+		"Written changelog file to ./changelog.json and ./changelog.md!\nRemember this is not directly compatible with website posts; use a JSON to YAML parser like https://json2yaml.com/ to format the data properly.",
 	);
 	process.exit();
 }
