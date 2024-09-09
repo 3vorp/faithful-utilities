@@ -1,3 +1,4 @@
+const { writeFileSync } = require("fs");
 const { api_url } = require("../lib/getTokens")();
 
 /**
@@ -19,27 +20,22 @@ async function textureIntegrity() {
 	]);
 
 	// quick version of /v2/textures/<id>/all for every texture
-	const all = textures.map((tex) => ({
-		...tex,
-		uses: uses.filter((u) => u.texture == tex.id),
+	const all = textures.map((tex) => {
+		tex.uses = uses.filter((u) => u.texture == tex.id);
 		// not reliant on uses and can catch "stranded" paths
-		paths: paths.filter((p) => p.use.match(/\d+/g)?.[0] == tex.id),
-	}));
+		tex.paths = paths.filter((p) => p.use.match(/\d+/g)?.[0] == tex.id);
+		return tex;
+	});
 
-	require("fs").writeFileSync(
-		"./out.json",
-		JSON.stringify(
-			all.filter(
-				(t) =>
-					!t.tags.length ||
-					!t.paths.length ||
-					!t.uses.length ||
-					t.paths.some((p) => !p.versions.length),
-			),
-			null,
-			4,
-		),
+	const invalid = all.filter(
+		(t) =>
+			!t.tags.length ||
+			!t.paths.length ||
+			!t.uses.length ||
+			t.paths.some((p) => !p.versions.length),
 	);
+
+	writeFileSync("./out.json", JSON.stringify(invalid, null, 4));
 	console.log("Written file to ./out.json!");
 	process.exit();
 }

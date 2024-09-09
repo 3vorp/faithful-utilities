@@ -33,11 +33,13 @@ function parseTextureIndexing(indexes, textures) {
 						const [min, max] = item.split("-").map((i) => Number(i));
 						// not a range
 						if (isNaN(min) || isNaN(max)) return acc;
-						return [...acc, ...textures.slice(min - 1, max)];
+						acc.push(...textures.slice(min - 1, max));
+						return acc;
 					}
 
 					// regular number
-					return [...acc, textures[Number(item) - 1]];
+					acc.push(textures[Number(item) - 1]);
+					return acc;
 				}, [])
 				.filter((i) => i) // remove undefined items
 				.map((t) => t.id),

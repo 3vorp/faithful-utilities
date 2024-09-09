@@ -1,3 +1,4 @@
+const { writeFileSync } = require("fs");
 const { api_url } = require("../lib/getTokens")();
 
 const PACK = "faithful_32x";
@@ -23,11 +24,12 @@ async function findMissingContributions() {
 
 	const ignoredPaths = Object.values(
 		Object.groupBy(
-			paths.map((p) => ({
-				...p,
-				edition: uses[p.use].edition,
-				texture: parseInt(p.use),
-			})),
+			paths.map((p) => {
+				p.edition = uses[p.use].edition;
+				// quick hack to remove use letter
+				p.texture = parseInt(p.use);
+				return p;
+			}),
 			({ texture }) => texture,
 		),
 	)
@@ -50,7 +52,7 @@ async function findMissingContributions() {
 		({ id }) => !ignoredPaths[id] && !contributions.includes(id),
 	);
 
-	require("fs").writeFileSync(
+	writeFileSync(
 		"out.txt",
 		missingTextures.map((texture) => `[#${texture.id}] ${texture.name}`).join("\n"),
 	);

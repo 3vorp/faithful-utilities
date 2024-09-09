@@ -1,3 +1,4 @@
+const { writeFileSync } = require("fs");
 const { api_url } = require("../lib/getTokens")();
 const minecraftSorter = require("../lib/minecraftSorter");
 
@@ -21,10 +22,11 @@ async function assetPathFinder() {
 		console.log(path);
 		const shownVersions =
 			versions.length == 1 ? versions[0] : `${versions[0]} - ${versions[versions.length - 1]}`;
-		return [...acc, `[#${path.use.match(/\d+/)?.[0]}] - ${path.name} [${shownVersions}]`];
+		acc.push(`[#${path.use.match(/\d+/)?.[0]}] - ${path.name} [${shownVersions}]`);
+		return acc;
 	}, []);
 
-	require("fs").writeFileSync("out.txt", results.join("\n"));
+	writeFileSync("out.txt", results.join("\n"));
 	console.log("Written file to ./out.txt!");
 	process.exit();
 }

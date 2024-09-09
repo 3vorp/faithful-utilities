@@ -35,15 +35,19 @@ async function createChangelog() {
 			.join("\n\t")}\nChoose which pack you want using the corresponding number: `,
 	);
 
+	// subtract one because the user-facing option uses 1-indexed array
+	const selectedPack = packs[packIndex - 1];
 	console.log("Collecting data...");
 
 	// get author names
 	const packContributions = allContributions
-		.filter((contribution) => contribution.pack === packs[packIndex - 1].id)
-		.map((contribution) => ({
-			...contribution,
-			authors: contribution.authors.map((author) => IDtoUsername[author] ?? "Anonymous"),
-		}));
+		.filter((contribution) => contribution.pack === selectedPack.id)
+		.map((contribution) => {
+			contribution.authors = contribution.authors.map(
+				(author) => IDtoUsername[author] ?? "Anonymous",
+			);
+			return contribution;
+		});
 
 	const textures = await fetch(`${api_url}textures/raw`).then((res) => res.json());
 
@@ -53,10 +57,12 @@ async function createChangelog() {
 			...contribution,
 			...textures[contribution.texture],
 		}))
-		.map((data) => ({
-			...data,
-			tags: data.tags.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase())).sort(),
-		}));
+		.map((data) => {
+			data.tags = data.tags
+				.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase()))
+				.sort();
+			return data;
+		});
 
 	const finalData = Object.values(
 		duplicateData.reduce((acc, cur) => {
@@ -68,16 +74,11 @@ async function createChangelog() {
 	);
 
 	// group by texture tag (easier than going off paths)
-	const formatted = finalData.reduce(
-		(acc, texture) => ({
-			...acc,
-			[texture.tags[0]]: [
-				...(acc[texture.tags[0]] ?? []),
-				`${toTitleCase(texture.name)} (${texture.authors.join(", ")})`,
-			],
-		}),
-		{},
-	);
+	const formatted = finalData.reduce((acc, texture) => {
+		acc[texture.tags[0]] ||= [];
+		acc[texture.tags[0]].push(`${toTitleCase(texture.name)} (${texture.authors.join(", ")})`);
+		return acc;
+	}, {});
 
 	console.log(formatted);
 
@@ -88,8 +89,9 @@ async function createChangelog() {
 			.map(([k, v]) => `## ${k}\n- ${v.join("\n- ")}`)
 			.join("\n\n"),
 	);
+	console.log("Written changelog file to ./changelog.json and ./changelog.md!");
 	console.log(
-		"Written changelog file to ./changelog.json and ./changelog.md!\nRemember this is not directly compatible with website posts; use a JSON to YAML parser like https://json2yaml.com/ to format the data properly.",
+		"Remember this is not directly compatible with website posts; use a JSON to YAML parser like https://json2yaml.com/ to format the data properly.",
 	);
 	process.exit();
 }
