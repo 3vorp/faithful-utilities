@@ -1,3 +1,6 @@
+> [!WARNING]
+> Some of these tools have been made redundant by Faithful web app improvements, and most of the others are planned to be migrated at some point. That's essentially to say that this repository has effectively entered a maintenance-only stage and no new tools are planned (all future tool ideas will likely be integrated into the web app directly where possible).
+
 These are a collection of various utilities I've made to ease Faithful database management and usage.
 
 **All utilities are stored in the [`tools/`](./tools/) folder.**
