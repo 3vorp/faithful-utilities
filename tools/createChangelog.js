@@ -31,7 +31,7 @@ async function createChangelog() {
 	// choice menu is easier than manually entering in pack ids
 	const packIndex = await prompt(
 		`Please provide the pack to create a changelog for:\n\t${packs
-			.map((v, i) => `${i + 1}) ${v.name}`)
+			.map(({ name }, i) => `${i + 1}) ${name}`)
 			.join("\n\t")}\nChoose which pack you want using the corresponding number: `,
 	);
 

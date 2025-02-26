@@ -96,7 +96,7 @@ async function createContributions(previousContributions = []) {
 			.map(
 				(u) => usernameToID[u.toLowerCase()] ?? console.error(`No user called "${u}" was found!`),
 			)
-			.filter((v) => v);
+			.filter((id) => id);
 	}
 
 	const textures = await getTextures();

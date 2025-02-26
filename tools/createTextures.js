@@ -58,7 +58,7 @@ async function createTextures(previousTextures = []) {
 			mcmeta: false,
 		};
 
-		const existingIndex = out.uses.findIndex((v) => v.edition === edition);
+		const existingIndex = out.uses.findIndex((use) => use.edition === edition);
 		if (existingIndex == -1) {
 			// use with correct edition doesn't exist yet, make a new one
 			out.uses.push({
@@ -69,7 +69,7 @@ async function createTextures(previousTextures = []) {
 			});
 		} else out.uses[existingIndex].paths.push(pathData);
 
-		const textureFolderIndex = path.split("/").findIndex((v) => v == "textures");
+		const textureFolderIndex = path.split("/").findIndex((dir) => dir === "textures");
 		out.tags = sortTags(
 			[
 				...out.tags,
