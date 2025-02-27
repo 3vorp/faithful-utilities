@@ -90,9 +90,7 @@ async function createChangelog() {
 			.join("\n\n"),
 	);
 	console.log("Written changelog file to ./changelog.json and ./changelog.md!");
-	console.log(
-		"Remember this is not directly compatible with website posts; use a JSON to YAML parser like https://json2yaml.com/ to format the data properly.",
-	);
+	console.log("Remember to sort this into Added, Changed, and Fixed categories before adding it to the post.");
 	process.exit();
 }
 
