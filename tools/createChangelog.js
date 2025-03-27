@@ -47,8 +47,12 @@ async function createChangelog() {
 		// get correct pack (there's no endpoint for both date and pack)
 		.filter((contribution) => contribution.pack === selectedPack.id)
 		// merge the two objects by id
-		.map(({ texture, date, authors }) => {
+		.map(({ texture, date, authors, id }) => {
 			const tex = textures[texture];
+			if (!tex) {
+				console.warn(`⚠️ Texture [#${texture}] doesn't exist anymore! (${id})`);
+				return null;
+			}
 			const tags = tex.tags
 				.filter((tag) => !["java", "bedrock"].includes(tag.toLowerCase()))
 				.sort();
@@ -62,6 +66,7 @@ async function createChangelog() {
 		})
 		// remove duplicates
 		.reduce((acc, cur) => {
+			if (cur === null) return acc;
 			// newer date wins
 			if (acc[cur.id] === undefined || acc[cur.id]?.date < cur.date) acc[cur.id] = cur;
 			return acc;
