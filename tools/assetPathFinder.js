@@ -1,6 +1,6 @@
 const { writeFileSync } = require("fs");
 const { api_url } = require("../lib/getTokens")();
-const minecraftSorter = require("../lib/minecraftSorter");
+const versionSorter = require("../lib/versionSorter");
 
 /**
  * Find paths that don't have assets/minecraft at the start when they probably should.
@@ -11,7 +11,7 @@ async function assetPathFinder() {
 
 	const results = Object.values(paths).reduce((acc, path) => {
 		if (path.name.startsWith("assets")) return acc;
-		const versions = path.versions.sort(minecraftSorter);
+		const versions = path.versions.sort(versionSorter);
 		if (
 			versions.includes("bedrock-latest") ||
 			versions.includes("1.4.6") ||
