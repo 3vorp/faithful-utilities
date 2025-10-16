@@ -1,5 +1,5 @@
 const { writeFileSync } = require("fs");
-const { api_url } = require("../lib/getTokens")();
+const { api_url } = require("../../lib/getTokens")();
 
 const PACK = "faithful_32x";
 

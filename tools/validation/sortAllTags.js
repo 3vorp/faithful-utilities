@@ -1,5 +1,5 @@
-const sortTags = require("../lib/sortTags");
-const { faithful_api_token, api_url, dev } = require("../lib/getTokens")();
+const sortTags = require("../../lib/sortTags");
+const { faithful_api_token, api_url, dev } = require("../../lib/getTokens")();
 
 /**
  * Sort the tags of all textures that aren't properly sorted.

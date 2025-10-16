@@ -1,6 +1,6 @@
 const { writeFileSync } = require("fs");
-const { api_url } = require("../lib/getTokens")();
-const versionSorter = require("../lib/versionSorter");
+const { api_url } = require("../../lib/getTokens")();
+const versionSorter = require("../../lib/versionSorter");
 
 /**
  * Find paths that don't have assets/minecraft at the start when they probably should.
