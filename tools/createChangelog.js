@@ -97,6 +97,6 @@ async function createChangelog() {
 	process.exit();
 }
 
-console.log("NOTE: This tool has been superceded by the newer version on the Faithful Web App, and hence has been deprecated.");
+console.log("NOTE: This tool has been superseded by the newer version on the Faithful Web App, and hence has been deprecated.");
 console.log("This will probably continue to work, but any upgrades or bug fixes will not be reflected here.");
 createChangelog();
